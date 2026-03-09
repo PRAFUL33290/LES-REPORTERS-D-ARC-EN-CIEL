@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Les Reporters d'Arc-en-Ciel</title>
+  <style>
+    /* ── Reset & Variables ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #2E6FA3;
+      --blue-light: #8FA9BC;
+      --red:        #E53935;
+      --yellow:     #F4B400;
+      --white:      #FFFFFF;
+      --grey:       #F5F5F5;
+      --text:       #2C2C2C;
+      --radius:     16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.7;
+    }
+
+    /* ── Typography ── */
+    h1, h2, h3 { line-height: 1.2; }
+
+    /* ── Utilities ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .badge {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--text);
+      font-weight: 700;
+      font-size: .78rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 50px;
+      margin-bottom: 14px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      background: var(--blue);
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(0,0,0,.18);
+    }
+    nav .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    nav .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    nav .nav-logo img { height: 44px; width: 44px; border-radius: 50%; object-fit: cover; }
+    nav .nav-logo span { color: var(--white); font-weight: 700; font-size: 1rem; }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 28px;
+    }
+    nav ul li a {
+      color: rgba(255,255,255,.85);
+      text-decoration: none;
+      font-size: .9rem;
+      font-weight: 500;
+      transition: color .2s;
+    }
+    nav ul li a:hover { color: var(--yellow); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--blue) 0%, #1a4f7a 100%);
+      color: var(--white);
+      padding: 90px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+      pointer-events: none;
+    }
+    .hero img.logo {
+      width: 160px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 5px solid rgba(255,255,255,.3);
+      box-shadow: 0 8px 40px rgba(0,0,0,.25);
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .hero h1 span.red  { color: var(--red); }
+    .hero h1 span.yellow { color: var(--yellow); }
+    .hero .tagline {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: rgba(255,255,255,.85);
+      max-width: 600px;
+      margin: 0 auto 32px;
+      position: relative;
+    }
+    .hero-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      position: relative;
+    }
+    .chip {
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.35);
+      color: var(--white);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: .9rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+    .chip.accent { background: var(--yellow); border-color: var(--yellow); color: var(--text); }
+
+    /* ── WAVE ── */
+    .wave {
+      display: block;
+      width: 100%;
+      height: 60px;
+      background: var(--blue);
+    }
+    .wave-bottom { background: var(--white); }
+    .wave svg { display: block; width: 100%; }
+
+    /* ── SECTION BASE ── */
+    section { padding: 72px 0; }
+    section:nth-child(even) { background: var(--grey); }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: var(--blue);
+    }
+    .section-lead {
+      font-size: 1.05rem;
+      color: #555;
+      max-width: 680px;
+      margin-bottom: 48px;
+    }
+
+    /* ── INTRO / CARDS ── */
+    .intro-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .intro-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px 22px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(46,111,163,.1);
+      border-top: 4px solid var(--blue);
+      transition: transform .25s, box-shadow .25s;
+    }
+    section:nth-child(even) .intro-card { background: var(--white); }
+    .intro-card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(46,111,163,.18); }
+    .intro-card .icon {
+      font-size: 2.4rem;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .intro-card h3 { font-size: 1rem; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
+    .intro-card p { font-size: .88rem; color: #666; }
+
+    /* ── TIMELINE ── */
+    .timeline { display: flex; flex-direction: column; gap: 0; }
+    .tl-item {
+      display: flex;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .tl-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 52px;
+    }
+    .tl-dot {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+      border: 3px solid var(--white);
+      box-shadow: 0 0 0 3px var(--blue-light);
+    }
+    .tl-line {
+      width: 3px;
+      flex: 1;
+      background: linear-gradient(to bottom, var(--blue-light), transparent);
+      margin: 4px auto 0;
+    }
+    .tl-item:last-child .tl-line { display: none; }
+    .tl-content {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      flex: 1;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+      border-left: 4px solid var(--blue);
+    }
+    .tl-content h3 { color: var(--blue); font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .tl-content .period { font-size: .82rem; color: var(--blue-light); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+    .tl-content ul { padding-left: 18px; }
+    .tl-content ul li { font-size: .92rem; color: #555; margin-bottom: 4px; }
+
+    .tl-dot.blue   { background: var(--blue); }
+    .tl-dot.red    { background: var(--red); }
+    .tl-dot.yellow { background: var(--yellow); }
+    .tl-dot.green  { background: #43A047; }
+
+    /* ── OBJECTIVES GRID ── */
+    .obj-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .obj-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.07);
+    }
+    .obj-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .obj-icon.blue   { background: rgba(46,111,163,.12); }
+    .obj-icon.red    { background: rgba(229,57,53,.12); }
+    .obj-icon.yellow { background: rgba(244,180,0,.15); }
+    .obj-icon.green  { background: rgba(67,160,71,.12); }
+    .obj-card h3 { font-size: .97rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .obj-card p  { font-size: .85rem; color: #666; }
+
+    /* ── HIGHLIGHT BAND ── */
+    .highlight-band {
+      background: linear-gradient(135deg, var(--blue) 0%, #1a4f7a 100%);
+      color: var(--white);
+      padding: 60px 24px;
+      text-align: center;
+    }
+    .highlight-band h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; margin-bottom: 16px; }
+    .highlight-band p  { font-size: 1.05rem; max-width: 640px; margin: 0 auto; color: rgba(255,255,255,.85); }
+    .skills-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 32px;
+    }
+    .skill-chip {
+      background: rgba(255,255,255,.15);
+      border: 1.5px solid rgba(255,255,255,.3);
+      color: var(--white);
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-size: .9rem;
+      font-weight: 600;
+    }
+
+    /* ── SCHEDULE VISUAL ── */
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .schedule-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.1);
+    }
+    .schedule-card .s-header {
+      padding: 20px 24px;
+      color: var(--white);
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .schedule-card.monday .s-header  { background: var(--blue); }
+    .schedule-card.wednesday .s-header { background: var(--red); }
+    .schedule-card .s-body {
+      background: var(--white);
+      padding: 20px 24px;
+    }
+    .schedule-card .s-body .time {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .schedule-card.monday .s-body .time   { color: var(--blue); }
+    .schedule-card.wednesday .s-body .time { color: var(--red); }
+    .schedule-card .s-body p { font-size: .9rem; color: #666; }
+    .schedule-note {
+      margin-top: 24px;
+      background: rgba(244,180,0,.15);
+      border-left: 4px solid var(--yellow);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 16px 20px;
+      font-size: .9rem;
+      color: #555;
+    }
+    .schedule-note strong { color: var(--text); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #1a1a2e;
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      padding: 40px 24px;
+    }
+    footer img { height: 64px; margin-bottom: 16px; border-radius: 50%; }
+    footer p { font-size: .88rem; }
+    footer .rainbow {
+      height: 4px;
+      background: linear-gradient(90deg, #E53935, #F4B400, #43A047, #2E6FA3, #9C27B0);
+      margin-bottom: 0;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      nav ul { display: none; }
+      .tl-item { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="inner">
+      <a class="nav-logo" href="#">
+        <img src="Logo.png" alt="Logo Les Petits Reporters" />
+        <span>Les Reporters d'Arc-en-Ciel</span>
+      </a>
+      <ul>
+        <li><a href="#projet">Le projet</a></li>
+        <li><a href="#programme">Programme</a></li>
+        <li><a href="#objectifs">Objectifs</a></li>
+        <li><a href="#horaires">Horaires</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <img class="logo" src="Logo.png" alt="Les Petits Reporters" />
+    <h1>Les <span class="red">Reporters</span><br>d'<span class="yellow">Arc-en-Ciel</span></h1>
+    <p class="tagline">
+      Un atelier créatif et numérique où vos enfants deviennent de véritables apprentis journalistes !
+    </p>
+    <div class="hero-chips">
+      <span class="chip">8 – 11 ans • Cycle 3</span>
+      <span class="chip accent">Lundi 12h – 13h</span>
+      <span class="chip accent">Mercredi après-midi</span>
+      <span class="chip">Loisirs & Découverte</span>
+    </div>
+  </header>
+
+  <!-- WAVE -->
+  <div style="background:var(--blue);line-height:0;">
+    <svg viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:60px;">
+      <path d="M0,0 C360,60 1080,60 1440,0 L1440,60 L0,60 Z" fill="#ffffff"/>
+    </svg>
+  </div>
+
+  <!-- PROJET -->
+  <section id="projet">
+    <div class="container">
+      <span class="badge">Le projet</span>
+      <h2 class="section-title">Bienvenue dans la rédaction !</h2>
+      <p class="section-lead">
+        Chaque semaine, votre enfant enfile le costume de reporter et participe à la création du média de son école.
+        Un espace de jeu, de curiosité et d'expression — toujours dans la bonne humeur.
+      </p>
+
+      <div class="intro-grid">
+        <div class="intro-card">
+          <span class="icon">📰</span>
+          <h3>Articles & Reportages</h3>
+          <p>Rédiger, raconter, interviewer les adultes du centre.</p>
+        </div>
+        <div class="intro-card">
+          <span class="icon">📸</span>
+          <h3>Photos & Vidéos</h3>
+          <p>Capturer les moments de vie et apprendre les bases du reportage visuel.</p>
+        </div>
+        <div class="intro-card">
+          <span class="icon">💻</span>
+          <h3>Initiation numérique</h3>
+          <p>Découvrir l'ordinateur, les fichiers, internet… de façon ludique.</p>
+        </div>
+        <div class="intro-card">
+          <span class="icon">📖</span>
+          <h3>Magazine familial</h3>
+          <p>Un magazine réalisé par les enfants, offert aux familles.</p>
+        </div>
+        <div class="intro-card">
+          <span class="icon">🌐</span>
+          <h3>Site web</h3>
+          <p>Participer à la création d'un vrai site web pour partager leurs créations.</p>
+        </div>
+        <div class="intro-card">
+          <span class="icon">🎙️</span>
+          <h3>Podcasts & Audio</h3>
+          <p>Bientôt : s'initier à l'enregistrement audio et à la narration sonore.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:32px; padding:24px 28px; background:rgba(46,111,163,.07); border-radius:var(--radius); border-left:4px solid var(--blue);">
+        <strong style="color:var(--blue);">Un lien précieux avec la famille</strong>
+        <p style="margin-top:6px;color:#555;font-size:.95rem;">
+          Ce projet crée un pont entre le centre et les familles, notamment lorsque l'accès aux locaux est limité.
+          Les parents découvrent la vie de leur enfant à travers ses propres mots et images.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAMME -->
+  <section id="programme">
+    <div class="container">
+      <span class="badge">Programme de l'année</span>
+      <h2 class="section-title">Une aventure qui évolue tout au long de l'année</h2>
+      <p class="section-lead">
+        L'atelier progresse par étapes, pour que chaque enfant découvre à son rythme le monde du journalisme et du numérique.
+      </p>
+
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot blue">📰</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-content">
+            <div class="period">Septembre – Décembre</div>
+            <h3>Phase Reportage : on devient journaliste !</h3>
+            <ul>
+              <li>Réaliser des reportages dans le centre</li>
+              <li>Interviewer les animateurs, enseignants et personnel</li>
+              <li>Rédiger des articles et prendre des photos</li>
+              <li>Découvrir le fonctionnement d'une rédaction</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot red">💻</div>
+            <div class="tl-line"></div>
+          </div>
+          <div class="tl-content">
+            <div class="period">Janvier – Mars</div>
+            <h3>Initiation à l'informatique</h3>
+            <ul>
+              <li>Créer, renommer, déplacer et organiser des fichiers</li>
+              <li>Réaliser des recherches sur internet</li>
+              <li>Comprendre comment est construit un ordinateur</li>
+              <li>Découvrir la culture du numérique</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-left">
+            <div class="tl-dot yellow">🚀</div>
+          </div>
+          <div class="tl-content">
+            <div class="period">Prochaines périodes</div>
+            <h3>Vers de nouveaux horizons…</h3>
+            <ul>
+              <li>L'audio et le podcast</li>
+              <li>La vidéo et le montage</li>
+              <li>La photographie artistique</li>
+              <li>La création et publication sur un site web</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- OBJECTIFS -->
+  <section id="objectifs">
+    <div class="container">
+      <span class="badge">Objectifs pédagogiques</span>
+      <h2 class="section-title">Ce que votre enfant développe</h2>
+      <p class="section-lead">
+        Bien plus qu'un atelier, c'est un espace où chaque enfant grandit à travers la pratique, la création et le partage.
+      </p>
+
+      <div class="obj-grid">
+        <div class="obj-card">
+          <div class="obj-icon blue">🔍</div>
+          <div>
+            <h3>Curiosité & esprit critique</h3>
+            <p>Apprendre à observer, questionner et vérifier l'information.</p>
+          </div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-icon yellow">🎨</div>
+          <div>
+            <h3>Créativité</h3>
+            <p>Inventer, imaginer, raconter avec ses propres mots et images.</p>
+          </div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-icon green">🤝</div>
+          <div>
+            <h3>Travail en équipe</h3>
+            <p>Collaborer, s'écouter et construire quelque chose ensemble.</p>
+          </div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-icon red">🗣️</div>
+          <div>
+            <h3>Expression orale & écrite</h3>
+            <p>Prendre la parole, rédiger et structurer ses idées.</p>
+          </div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-icon blue">🖥️</div>
+          <div>
+            <h3>Culture numérique</h3>
+            <p>Comprendre et maîtriser les outils du monde d'aujourd'hui.</p>
+          </div>
+        </div>
+        <div class="obj-card">
+          <div class="obj-icon yellow">⭐</div>
+          <div>
+            <h3>Confiance en soi</h3>
+            <p>Oser, créer et être fier de montrer son travail aux familles.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HIGHLIGHT -->
+  <div class="highlight-band">
+    <div class="container">
+      <h2>Pourquoi c'est une chance pour votre enfant ?</h2>
+      <p>
+        Savoir utiliser un ordinateur, comprendre les médias, s'exprimer à l'écrit et à l'oral…
+        Ces compétences sont devenues <strong>essentielles</strong> dans notre société.
+        Cet atelier offre à vos enfants une initiation concrète, ludique et bienveillante — dès le plus jeune âge.
+      </p>
+      <div class="skills-chips">
+        <span class="skill-chip">Autonomie</span>
+        <span class="skill-chip">Prise de parole</span>
+        <span class="skill-chip">Initiation au numérique</span>
+        <span class="skill-chip">Découverte des métiers des médias</span>
+        <span class="skill-chip">Valorisation du travail</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HORAIRES -->
+  <section id="horaires">
+    <div class="container">
+      <span class="badge">Horaires & Informations</span>
+      <h2 class="section-title">Quand se retrouve la rédaction ?</h2>
+      <p class="section-lead">
+        L'atelier a lieu deux fois par semaine. Un rythme pensé pour la découverte et le plaisir, sans pression.
+      </p>
+
+      <div class="schedule-grid">
+        <div class="schedule-card monday">
+          <div class="s-header">🗓 Lundi — Pause déjeuner</div>
+          <div class="s-body">
+            <div class="time">12h00 – 13h00</div>
+            <p>Un créneau court et dynamique pour avancer sur les projets en cours, en petit groupe.</p>
+          </div>
+        </div>
+        <div class="schedule-card wednesday">
+          <div class="s-header">🗓 Mercredi — Après-midi</div>
+          <div class="s-body">
+            <div class="time">Mercredi après-midi</div>
+            <p>Un temps plus long pour créer, explorer et expérimenter ensemble dans la bonne humeur.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="schedule-note">
+        <strong>Participation libre et sans pression</strong><br />
+        La participation à l'atelier est une <em>proposition d'activité</em>.
+        Les enfants ne sont jamais obligés d'y prendre part. L'idée, c'est que chaque enfant vienne parce qu'il en a envie, par curiosité et par plaisir !
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="rainbow"></div>
+    <div style="padding:40px 24px;">
+      <img src="Logo.png" alt="Logo" />
+      <p style="font-weight:700;color:var(--white);font-size:1.1rem;margin-bottom:8px;">Les Reporters d'Arc-en-Ciel</p>
+      <p>Un atelier hebdomadaire où les enfants deviennent acteurs de l'information,<br>découvrent le numérique et partagent leur monde avec leurs familles.</p>
+      <p style="margin-top:20px;font-size:.8rem;color:rgba(255,255,255,.4);">8 – 11 ans • Cycle 3 • Lundi & Mercredi</p>
+    </div>
+  </footer>
+
+</body>
+</html>
