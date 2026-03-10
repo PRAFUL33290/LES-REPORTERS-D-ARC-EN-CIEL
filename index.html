@@ -25,7 +25,7 @@
     body {
       font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
       color: var(--text);
-      background: var(--white);
+      background: #000;
       line-height: 1.7;
     }
 
@@ -49,11 +49,31 @@
 
     /* ── NAV ── */
     nav {
-      background: linear-gradient(90deg, var(--blue-light), var(--blue));
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      isolation: isolate;
+      background: none;
       z-index: 100;
       box-shadow: 0 2px 12px rgba(0,0,0,.18);
     }
+    nav::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url('IMG_1432.png') center center / cover no-repeat;
+      z-index: -2;
+    }
+    nav::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(46,111,163,.82), rgba(143,169,188,.76));
+      z-index: -1;
+    }
     nav .inner {
+      position: relative;
+      z-index: 1;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -161,6 +181,9 @@
     /* ── SECTION BASE ── */
     section { padding: 72px 0; }
     section:nth-child(even) { background: var(--grey); }
+    #projet,
+    #objectifs,
+    #horaires { background: var(--white); }
 
     .section-title {
       font-size: clamp(1.5rem, 3.5vw, 2.1rem);
@@ -620,9 +643,10 @@
       nav .nav-logo span { font-size: .95rem; }
       .tl-item { gap: 12px; }
       .hero { min-height: 100svh; }
-      .hero::before { background: rgba(0,0,0,.5); }
+      .hero-bg-img { object-position: center; }
+      .hero::before { background: rgba(0,0,0,0.2); }
       .hero-content { text-align: center; max-width: 100%; }
-      .hero-logo { width: min(300px, 80vw); margin: 0 auto; display: block; }
+      .hero-logo { width: min(800px, 80vw); margin: 0 auto; display: block; }
       .hero .tagline {
         font-size: clamp(.95rem, 4vw, 1.1rem);
         margin-left: auto;
@@ -676,7 +700,10 @@
 
   <!-- HERO -->
   <header class="hero">
-    <img class="hero-bg-img" src="BG.png" alt="" aria-hidden="true" />
+    <picture>
+      <source media="(max-width: 640px)" srcset="IMG_1432.png" />
+      <img class="hero-bg-img" src="BG.png" alt="" aria-hidden="true" />
+    </picture>
     <div class="container">
       <div class="hero-content">
         <img class="hero-logo" src="rsgwrddgxLOGO.png" alt="Les Reporters d'Arc-en-Ciel" />
