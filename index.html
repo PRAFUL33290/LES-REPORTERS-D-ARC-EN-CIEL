@@ -1133,9 +1133,40 @@
       <p style="font-size:.88rem;margin-bottom:20px;">Un atelier hebdomadaire où les enfants deviennent acteurs de l'information,<br>découvrent le numérique et partagent leur monde avec leurs familles.</p>
       <div style="width:40px;height:2px;background:rgba(244,180,0,.5);margin:0 auto 20px;"></div>
       <p style="font-size:.82rem;color:rgba(255,255,255,.35);">8 – 11 ans • Cycle 3 • Lundi &amp; Mercredi</p>
+      <p id="visitor-counter" style="margin-top:10px;font-size:.84rem;color:rgba(255,255,255,.7);font-weight:700;">
+        Visiteurs totaux : chargement...
+      </p>
       <p style="margin-top:16px;font-size:.78rem;color:rgba(255,255,255,.22);">Animateur Julien</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var counterElement = document.getElementById('visitor-counter');
+      if (!counterElement) return;
+
+      var namespace = 'reporters-arc-en-ciel';
+      var key = 'visiteurs-total';
+      var endpoint = 'https://api.countapi.xyz/hit/' + namespace + '/' + key;
+
+      fetch(endpoint, { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Erreur API compteur');
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          if (typeof data.value !== 'number') {
+            throw new Error('Valeur compteur invalide');
+          }
+          counterElement.textContent = 'Visiteurs totaux : ' + data.value.toLocaleString('fr-FR');
+        })
+        .catch(function () {
+          counterElement.textContent = 'Visiteurs totaux : indisponible';
+        });
+    })();
+  </script>
 
 </body>
 </html>
